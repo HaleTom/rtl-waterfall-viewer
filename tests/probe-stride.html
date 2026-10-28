@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../d3.v4.min.js"></script>
+<script src="../waterfall.js"></script>
+<script src="../app.js" defer></script>
+</head>
+<body>
+<input type="file" id="file" accept=".csv">
+<a href="#" id="download" download="waterfall.png" style="display:none">Download</a>
+<div id="status">boot</div>
+<span id="stride-row" style="display:none">Show every <input type="number" id="stride" min="1" step="1" style="width:5em">th sweep <span id="stride-warn" style="color:red"></span></span>
+<div id="waterfall"></div>
+<script>
+// Test probe for the stride box: 2100-line fixture (auto stride 2), then an
+// invalid entry (warn, no re-render) and a valid one (re-render every 5th).
+var report = {};
+function fireChange(el) {
+  var ev = new Event('change', { bubbles: true });
+  el.dispatchEvent(ev);
+}
+var n = 0;
+var iv = setInterval(function () {
+  if (++n > 400) { document.title = 'STRIDE:timeout'; clearInterval(iv); return; }
+  var st = document.getElementById('status').textContent;
+  if (st.indexOf('sweeps') === -1 || report.phase) return;
+  report.phase = 'loaded';
+  var row = document.getElementById('stride-row');
+  var box = document.getElementById('stride');
+  report.boxShown = row.style.display !== 'none';
+  report.boxDefault = box.value;
+  report.statusAuto = st;
+  box.value = '0';
+  fireChange(box);
+  report.warnSet = document.getElementById('stride-warn').textContent.length > 0;
+  report.statusKept = document.getElementById('status').textContent;
+  box.value = '5';
+  fireChange(box);
+  var m = 0;
+  var iv2 = setInterval(function () {
+    if (++m > 400) { document.title = 'STRIDE:timeout2'; clearInterval(iv2); return; }
+    var st2 = document.getElementById('status').textContent;
+    if (st2.indexOf('every 5th') !== -1) {
+      clearInterval(iv2);
+      report.validNote = true;
+      report.warnCleared = document.getElementById('stride-warn').textContent === '';
+      document.title = 'STRIDE:' + JSON.stringify(report);
+      clearInterval(iv);
+    }
+  }, 50);
+}, 50);
+window.addEventListener('load', function () {
+  fetch('fixture-huge.csv').then(function (r) { return r.text(); }).then(function (t) {
+    openText('fixture-huge.csv', t);
+  });
+});
+</script>
+</body>
+</html>

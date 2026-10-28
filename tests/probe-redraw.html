@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../d3.v4.min.js"></script>
+<script src="../waterfall.js"></script>
+</head>
+<body>
+<div id="waterfall"></div>
+<script>
+// Test probe: synchronous draws (no rAF) so headless pixels are deterministic.
+// ?redraw=1 also runs the real onInterpolateChange handler (Viridis -> Inferno).
+window.addEventListener('load', function () {
+  fetch('fixture-big.csv').then(function (r) { return r.text(); }).then(function (t) {
+    w = new Waterfall('#waterfall', '', null, false, true, false);
+    parseCSVData(t);
+    w.annotations = null;
+    initDisplay(w);
+    if (new URLSearchParams(location.search).has('redraw')) {
+      document.querySelector('#waterfall select').selectedIndex = 1;
+      onInterpolateChange();
+    }
+    document.title = 'DRAWN:' + w.data.values.length;
+  });
+});
+</script>
+</body>
+</html>

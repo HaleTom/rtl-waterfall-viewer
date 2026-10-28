@@ -1,0 +1,37 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="../d3.v4.min.js"></script>
+<script src="../waterfall.js"></script>
+<script src="../app.js" defer></script>
+<style>select { position: relative; z-index: 1; }</style>
+</head>
+<body>
+<input type="file" id="file" accept=".csv">
+<a href="#" id="download" download="waterfall.png" style="display:none">Download</a>
+<div id="status">boot</div>
+<span id="stride-row" style="display:none">Show every <input type="number" id="stride" min="1" step="1" style="width:5em">th sweep <span id="stride-warn" style="color:red"></span></span>
+<div id="waterfall"></div>
+<script>
+// Test probe: loads a fixture through the REAL app.js openText path, then
+// reports whether the interpolator dropdown is clickable.
+function probe() {
+  var sel = document.querySelector('#waterfall select');
+  if (!sel) { document.title = 'HIT:no-select'; return; }
+  var r = sel.getBoundingClientRect();
+  var el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+  document.title = 'HIT:' + (el ? el.tagName : 'null');
+}
+var n = 0;
+var iv = setInterval(function () {
+  if (++n > 200) { document.title = 'HIT:timeout'; clearInterval(iv); return; }
+  if (document.getElementById('status').textContent.indexOf('sweeps') !== -1) { clearInterval(iv); probe(); }
+}, 50);
+window.addEventListener('load', function () {
+  fetch('fixture-big.csv').then(function (r) { return r.text(); }).then(function (t) {
+    openText('fixture-big.csv', t);
+  });
+});
+</script>
+</body>
+</html>

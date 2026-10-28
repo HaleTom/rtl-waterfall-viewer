@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rtl_power waterfall</title>
+<script src="d3.v4.min.js"></script>
+<script src="waterfall.js"></script>
+<script src="app.js" defer></script>
+<style type="text/css">
+body { font-family: sans-serif; margin: 8px; }
+a, a:visited { color: red; }
+div.tooltip {
+    background: #000;
+    border: 0px;
+    border-radius: 3px;
+    color: #fff;
+    padding: 8px;
+    text-align: center;
+}
+#status { margin: 6px 0; color: #333; }
+#waterfall { width: 100%; }
+select { position: relative; z-index: 1; } /* above the transparent svg/zoom rect, which otherwise swallows clicks */
+</style>
+</head>
+<body>
+<input type="file" id="file" accept=".csv,text/csv">
+<a href="#" id="download" download="waterfall.png" style="display:none">Download</a>
+<div id="status">Pick an rtl_power CSV file.</div>
+<span id="stride-row" style="display:none">Show every <input type="number" id="stride" min="1" step="1" style="width:5em">th sweep <span id="stride-warn" style="color:red"></span></span>
+<div id="waterfall"></div>
+</body>
+</html>
